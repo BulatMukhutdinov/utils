@@ -10,7 +10,6 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 30
-        version "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
@@ -82,7 +81,7 @@ afterEvaluate {
 
                 groupId = 'tat.mukhutdinov.android'
                 artifactId = 'utils'
-                version = '1.0.0'
+                version = '1.1.1'
             }
         }
     }
