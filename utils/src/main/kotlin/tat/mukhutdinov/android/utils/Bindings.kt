@@ -1,5 +1,6 @@
 package tat.mukhutdinov.android.utils
 
+import android.animation.ValueAnimator
 import android.content.res.Resources
 import android.util.TypedValue
 import android.view.View
@@ -26,11 +27,24 @@ fun setTextColorAttr(textView: TextView, @AttrRes attr: Int) {
     textView.setTextColor(typedValue.data)
 }
 
-@BindingAdapter("verticalBias")
-fun setVerticalBias(view: View, bias: Float) {
+@BindingAdapter(value = ["verticalBias", "verticalBiasUpdateDuration"], requireAll = false)
+fun setVerticalBias(view: View, bias: Float, duration: Long?) {
     val params = view.layoutParams as ConstraintLayout.LayoutParams
-    params.verticalBias = bias
-    view.layoutParams = params
+
+    (view.tag as? ValueAnimator)?.apply { cancel() }
+
+    val animator = ValueAnimator.ofFloat(params.verticalBias, bias).apply {
+        this.duration = duration ?: 500
+
+        addUpdateListener {
+            params.verticalBias = it.animatedValue as Float
+            view.layoutParams = params
+        }
+
+        start()
+    }
+
+    view.tag = animator
 }
 
 @BindingAdapter("src")
