@@ -24,22 +24,31 @@ class SingleLiveData<T> : MutableLiveData<T>() {
 
     @MainThread
     override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
-        if (hasActiveObservers()) {
-            Timber.w("Multiple observers registered but only one will be notified of changes.")
-        }
+        warnObservers()
 
-        // Observe the internal MutableLiveData
-        super.observe(owner) { t ->
-            if (pending.compareAndSet(true, false)) {
-                observer.onChanged(t)
-            }
+        super.observe(owner) {
+            onChanged(observer, it)
         }
     }
 
-    fun observeUntilFirst(owner: LifecycleOwner, observer: Observer<in T>) {
-        observe(owner) { t ->
-            observer.onChanged(t)
-            removeObservers(owner)
+    @MainThread
+    override fun observeForever(observer: Observer<in T>) {
+        warnObservers()
+
+        super.observeForever {
+            onChanged(observer, it)
+        }
+    }
+
+    private fun onChanged(observer: Observer<in T>, value: T) {
+        if (pending.compareAndSet(true, false)) {
+            observer.onChanged(value)
+        }
+    }
+
+    private fun warnObservers() {
+        if (hasActiveObservers()) {
+            Timber.w("Multiple observers registered but only one will be notified of changes.")
         }
     }
 
