@@ -18,9 +18,13 @@ import java.util.concurrent.atomic.AtomicBoolean
  * <p>
  * Note that only one observer is going to be notified of changes.
  */
-class SingleLiveData<T> : MutableLiveData<T>() {
+class SingleLiveData<T> : MutableLiveData<T> {
 
     private val pending = AtomicBoolean(false)
+
+    constructor() : super()
+
+    constructor(value: T) : super(value)
 
     @MainThread
     override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
