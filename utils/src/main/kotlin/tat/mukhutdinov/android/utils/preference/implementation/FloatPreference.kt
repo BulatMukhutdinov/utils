@@ -1,29 +1,18 @@
 package tat.mukhutdinov.android.utils.preference.implementation
 
-import tat.mukhutdinov.android.utils.preference.PreferenceHelper
-import tat.mukhutdinov.android.utils.preference.boundary.Preference
+import android.content.SharedPreferences
+import tat.mukhutdinov.android.utils.preference.BasePreference
 
 class FloatPreference(
-    private val helper: PreferenceHelper,
-    private val defaultValue: Float = 0f
-) : Preference<Float> {
+    key: String,
+    override val preferences: SharedPreferences,
+    defaultValue: Float = 0f
+) : BasePreference<Float>(key, preferences, defaultValue) {
 
-    override val isSet: Boolean = helper.isSet
+    override fun getValue(key: String, defaultValue: Float): Float =
+        preferences.getFloat(key, defaultValue)
 
-    override fun get(): Float =
-        if (!helper.isSet) {
-            defaultValue
-        } else {
-            helper.preferences.getFloat(helper.key, defaultValue)
-        }
-
-    override fun set(value: Float) {
-        helper.preferences
-            .edit()
-            .putFloat(helper.key, value)
-            .apply()
+    override fun setValue(editor: SharedPreferences.Editor, key: String, value: Float) {
+        editor.putFloat(key, value)
     }
-
-    override fun delete() =
-        helper.delete()
 }

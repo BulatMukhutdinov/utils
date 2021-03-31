@@ -1,29 +1,18 @@
 package tat.mukhutdinov.android.utils.preference.implementation
 
-import tat.mukhutdinov.android.utils.preference.PreferenceHelper
-import tat.mukhutdinov.android.utils.preference.boundary.Preference
+import android.content.SharedPreferences
+import tat.mukhutdinov.android.utils.preference.BasePreference
 
 class BooleanPreference(
-    private val helper: PreferenceHelper,
-    private val defaultValue: Boolean = false
-) : Preference<Boolean> {
+    key: String,
+    override val preferences: SharedPreferences,
+    defaultValue: Boolean = false
+) : BasePreference<Boolean>(key, preferences, defaultValue) {
 
-    override val isSet: Boolean = helper.isSet
+    override fun getValue(key: String, defaultValue: Boolean): Boolean =
+        preferences.getBoolean(key, defaultValue)
 
-    override fun get(): Boolean =
-        if (!helper.isSet) {
-            defaultValue
-        } else {
-            helper.preferences.getBoolean(helper.key, defaultValue)
-        }
-
-    override fun set(value: Boolean) {
-        helper.preferences
-            .edit()
-            .putBoolean(helper.key, value)
-            .apply()
+    override fun setValue(editor: SharedPreferences.Editor, key: String, value: Boolean) {
+        editor.putBoolean(key, value)
     }
-
-    override fun delete() =
-        helper.delete()
 }

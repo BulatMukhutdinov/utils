@@ -1,31 +1,20 @@
 package tat.mukhutdinov.android.utils.preference.implementation
 
-import tat.mukhutdinov.android.utils.preference.PreferenceHelper
-import tat.mukhutdinov.android.utils.preference.boundary.Preference
+import android.content.SharedPreferences
+import tat.mukhutdinov.android.utils.preference.BasePreference
 
 class DoublePreference(
-    private val helper: PreferenceHelper,
-    private val defaultValue: Double = 0.0
-) : Preference<Double> {
+    key: String,
+    override val preferences: SharedPreferences,
+    defaultValue: Double = 0.0
+) : BasePreference<Double>(key, preferences, defaultValue) {
 
-    override val isSet: Boolean = helper.isSet
+    override fun getValue(key: String, defaultValue: Double): Double =
+        preferences.getLong(key, defaultValue.long()).double()
 
-    override fun get(): Double =
-        if (!helper.isSet) {
-            defaultValue
-        } else {
-            helper.preferences.getLong(helper.key, defaultValue.long()).double()
-        }
-
-    override fun set(value: Double) {
-        helper.preferences
-            .edit()
-            .putLong(helper.key, value.long())
-            .apply()
+    override fun setValue(editor: SharedPreferences.Editor, key: String, value: Double) {
+        editor.putLong(key, value.long())
     }
-
-    override fun delete() =
-        helper.delete()
 
     private fun Double.long() =
         java.lang.Double.doubleToRawLongBits(this)

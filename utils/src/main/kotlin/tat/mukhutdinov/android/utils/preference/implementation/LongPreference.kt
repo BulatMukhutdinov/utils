@@ -1,29 +1,18 @@
 package tat.mukhutdinov.android.utils.preference.implementation
 
-import tat.mukhutdinov.android.utils.preference.PreferenceHelper
-import tat.mukhutdinov.android.utils.preference.boundary.Preference
+import android.content.SharedPreferences
+import tat.mukhutdinov.android.utils.preference.BasePreference
 
 class LongPreference(
-    private val helper: PreferenceHelper,
-    private val defaultValue: Long = 0
-) : Preference<Long> {
+    key: String,
+    override val preferences: SharedPreferences,
+    defaultValue: Long = 0
+) : BasePreference<Long>(key, preferences, defaultValue) {
 
-    override val isSet: Boolean = helper.isSet
+    override fun getValue(key: String, defaultValue: Long): Long =
+        preferences.getLong(key, defaultValue)
 
-    override fun get(): Long =
-        if (!helper.isSet) {
-            defaultValue
-        } else {
-            helper.preferences.getLong(helper.key, defaultValue)
-        }
-
-    override fun set(value: Long) {
-        helper.preferences
-            .edit()
-            .putLong(helper.key, value)
-            .apply()
+    override fun setValue(editor: SharedPreferences.Editor, key: String, value: Long) {
+        editor.putLong(key, value)
     }
-
-    override fun delete() =
-        helper.delete()
 }

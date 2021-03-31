@@ -1,29 +1,18 @@
 package tat.mukhutdinov.android.utils.preference.implementation
 
-import tat.mukhutdinov.android.utils.preference.PreferenceHelper
-import tat.mukhutdinov.android.utils.preference.boundary.Preference
+import android.content.SharedPreferences
+import tat.mukhutdinov.android.utils.preference.BasePreference
 
 class StringPreference(
-    private val helper: PreferenceHelper,
-    private val defaultValue: String = ""
-) : Preference<String> {
+    key: String,
+    override val preferences: SharedPreferences,
+    defaultValue: String = ""
+) : BasePreference<String>(key, preferences, defaultValue) {
 
-    override val isSet: Boolean = helper.isSet
+    override fun getValue(key: String, defaultValue: String): String =
+        preferences.getString(key, defaultValue) ?: defaultValue
 
-    override fun get(): String =
-        if (!helper.isSet) {
-            defaultValue
-        } else {
-            helper.preferences.getString(helper.key, defaultValue) ?: defaultValue
-        }
-
-    override fun set(value: String) {
-        helper.preferences
-            .edit()
-            .putString(helper.key, value)
-            .apply()
+    override fun setValue(editor: SharedPreferences.Editor, key: String, value: String) {
+        editor.putString(key, value)
     }
-
-    override fun delete() =
-        helper.delete()
 }
