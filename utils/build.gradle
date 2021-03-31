@@ -54,18 +54,18 @@ kapt {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.fragment:fragment-ktx:1.3.0-rc01'
+    implementation 'androidx.fragment:fragment-ktx:1.3.2'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     // Lifecycle and LiveData
-    implementation "androidx.lifecycle:lifecycle-common-java8:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.3.1"
 
     // Gms
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
 
     //Utils
     implementation "com.jakewharton.timber:timber:4.7.1"
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.annotation:annotation:1.2.0'
 }
 
 afterEvaluate {
@@ -76,7 +76,7 @@ afterEvaluate {
 
                 groupId = 'tat.mukhutdinov.android'
                 artifactId = 'utils'
-                version = '1.5.1'
+                version = '1.5.2'
             }
         }
     }
