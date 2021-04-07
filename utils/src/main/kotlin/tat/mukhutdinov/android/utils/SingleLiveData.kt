@@ -24,7 +24,9 @@ class SingleLiveData<T> : MutableLiveData<T> {
 
     constructor() : super()
 
-    constructor(value: T) : super(value)
+    constructor(value: T) : super(value) {
+        pending.compareAndSet(false, true)
+    }
 
     @MainThread
     override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
