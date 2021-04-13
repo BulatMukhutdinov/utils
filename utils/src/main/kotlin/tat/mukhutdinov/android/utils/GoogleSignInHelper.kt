@@ -1,8 +1,8 @@
 package tat.mukhutdinov.android.utils
 
-import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -20,6 +20,11 @@ class GoogleSignInHelper(
     private lateinit var googleSignInLauncher: ActivityResultLauncher<Unit>
 
     override fun onCreate(owner: LifecycleOwner) {
+        silentSignIn(owner)
+        registerResultLauncher(owner)
+    }
+
+    private fun registerResultLauncher(owner: LifecycleOwner) {
         googleSignInLauncher = registry.register(KEY_ACTIVITY_RESULT, owner, GoogleSignInContract(googleSignInClient)) { googleAccount ->
             if (googleAccount != null) {
                 this.googleAccountStatus.value = AccessStatus.Available(googleAccount)
@@ -29,16 +34,18 @@ class GoogleSignInHelper(
         }
     }
 
-    fun requestGoogleSignIn(context: Context) {
+    private fun silentSignIn(owner: LifecycleOwner) {
+        (owner as? Fragment)?.context?.let { context ->
+            GoogleSignIn.getLastSignedInAccount(context)?.let { account ->
+                googleAccountStatus.value = AccessStatus.Available(account)
+            }
+        }
+    }
+
+    fun requestGoogleSignIn() {
         googleAccountStatus.value = AccessStatus.Loading
 
-        val googleAccount = GoogleSignIn.getLastSignedInAccount(context)
-
-        if (googleAccount == null) {
-            googleSignInLauncher.launch(Unit)
-        } else {
-            googleAccountStatus.value = AccessStatus.Available(googleAccount)
-        }
+        googleSignInLauncher.launch(Unit)
     }
 
     companion object {
