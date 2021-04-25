@@ -42,10 +42,16 @@ class GoogleSignInHelper(
         }
     }
 
-    fun requestGoogleSignIn() {
+    fun signIn() {
         googleAccountStatus.value = AccessStatus.Loading
 
         googleSignInLauncher.launch(Unit)
+    }
+
+    fun signOut() {
+        googleSignInClient.signOut().addOnSuccessListener {
+            googleAccountStatus.value = AccessStatus.Denied
+        }
     }
 
     companion object {
