@@ -25,23 +25,22 @@ class GoogleSignInHelper(
     private lateinit var googleSignInLauncher: ActivityResultLauncher<Unit>
 
     override fun onCreate(owner: LifecycleOwner) {
-        silentSignIn(owner)
-        registerResultLauncher()
-    }
-
-    private fun registerResultLauncher() {
         googleSignInLauncher = resultCaller.registerForActivityResult(GoogleSignInContract(googleSignInClient)) { googleAccount ->
-                if (googleAccount != null) {
-                    googleAccountStatus.value = AccessStatus.Available(googleAccount)
-                } else {
-                    googleAccountStatus.value = AccessStatus.Denied
-                }
+            if (googleAccount != null) {
+                googleAccountStatus.value = AccessStatus.Available(googleAccount)
+            } else {
+                googleAccountStatus.value = AccessStatus.Denied
             }
+        }
     }
 
-    private fun silentSignIn(owner: LifecycleOwner) {
+    override fun onStart(owner: LifecycleOwner) {
         (owner as? Fragment)?.context?.let { context ->
-            GoogleSignIn.getLastSignedInAccount(context)?.let { account ->
+            val account = GoogleSignIn.getLastSignedInAccount(context)
+
+            if (account == null) {
+                googleAccountStatus.value = AccessStatus.Denied
+            } else {
                 googleAccountStatus.value = AccessStatus.Available(account)
             }
         }
