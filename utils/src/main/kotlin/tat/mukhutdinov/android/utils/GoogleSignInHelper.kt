@@ -1,5 +1,6 @@
 package tat.mukhutdinov.android.utils
 
+import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
 import androidx.fragment.app.Fragment
@@ -10,9 +11,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import tat.mukhutdinov.android.utils.activityResultContract.GoogleSignInContract
 
+/**
+ * Если регестрировать колбеки через [ActivityResultRegistry], как советуется в документации https://developer.android.com/training/basics/intents/result#separate,
+ * то при использовании в двух фрагментах, колбек [ActivityResultRegistry.register] будет срабатывать только для первого.
+ */
 class GoogleSignInHelper(
     private val googleSignInClient: GoogleSignInClient,
-    private val registry: ActivityResultRegistry
+    private val resultCaller: ActivityResultCaller
 ) : DefaultLifecycleObserver {
 
     val googleAccountStatus = MutableLiveData<AccessStatus>(AccessStatus.NotLoading)
@@ -21,17 +26,17 @@ class GoogleSignInHelper(
 
     override fun onCreate(owner: LifecycleOwner) {
         silentSignIn(owner)
-        registerResultLauncher(owner)
+        registerResultLauncher()
     }
 
-    private fun registerResultLauncher(owner: LifecycleOwner) {
-        googleSignInLauncher = registry.register(KEY_ACTIVITY_RESULT, owner, GoogleSignInContract(googleSignInClient)) { googleAccount ->
-            if (googleAccount != null) {
-                this.googleAccountStatus.value = AccessStatus.Available(googleAccount)
-            } else {
-                this.googleAccountStatus.value = AccessStatus.Denied
+    private fun registerResultLauncher() {
+        googleSignInLauncher = resultCaller.registerForActivityResult(GoogleSignInContract(googleSignInClient)) { googleAccount ->
+                if (googleAccount != null) {
+                    googleAccountStatus.value = AccessStatus.Available(googleAccount)
+                } else {
+                    googleAccountStatus.value = AccessStatus.Denied
+                }
             }
-        }
     }
 
     private fun silentSignIn(owner: LifecycleOwner) {
@@ -52,9 +57,5 @@ class GoogleSignInHelper(
         googleSignInClient.signOut().addOnSuccessListener {
             googleAccountStatus.value = AccessStatus.Denied
         }
-    }
-
-    companion object {
-        private const val KEY_ACTIVITY_RESULT = "google_sign_in_activity_result_key"
     }
 }
