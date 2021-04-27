@@ -27,7 +27,7 @@ class GoogleSignInHelper(
     override fun onCreate(owner: LifecycleOwner) {
         googleSignInLauncher = resultCaller.registerForActivityResult(GoogleSignInContract(googleSignInClient)) { googleAccount ->
             if (googleAccount != null) {
-                googleAccountStatus.value = AccessStatus.Available(googleAccount)
+                googleAccountStatus.value = AccessStatus.Granted(googleAccount)
             } else {
                 googleAccountStatus.value = AccessStatus.Denied
             }
@@ -36,12 +36,10 @@ class GoogleSignInHelper(
 
     override fun onStart(owner: LifecycleOwner) {
         (owner as? Fragment)?.context?.let { context ->
-            val account = GoogleSignIn.getLastSignedInAccount(context)
+            val googleAccount = GoogleSignIn.getLastSignedInAccount(context)
 
-            if (account == null) {
-                googleAccountStatus.value = AccessStatus.Denied
-            } else {
-                googleAccountStatus.value = AccessStatus.Available(account)
+            if (googleAccount != null) {
+                googleAccountStatus.value = AccessStatus.Available(googleAccount)
             }
         }
     }
